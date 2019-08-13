@@ -30,6 +30,10 @@ module Thredded
           SELECT MAX(p2.created_at) from #{posts_table_name} p2 WHERE p2.postable_id = #{posts_table_name}.postable_id)
         SQL
         )
+
+        # When we can't load a preloader, return the results as-is
+        return result if preloader.empty?
+
         preloader[0].preloaded_records.each do |post|
           topic = owners_by_id.delete(post.postable_id)
           next unless topic
