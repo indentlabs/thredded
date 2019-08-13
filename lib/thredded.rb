@@ -88,6 +88,9 @@ module Thredded # rubocop:disable Metrics/ModuleLength
     # @return [Symbol] The name of the moderator flag column on the users table for the default permissions model
     attr_accessor :moderator_column
 
+    # @return [Boolean] Whether admin users see button to delete entire messageboards on the messageboard edit page.
+    attr_accessor :show_messageboard_delete_button
+
     #== UI
 
     # @return [String] The layout to use for rendering Thredded views.
@@ -252,6 +255,13 @@ module Thredded # rubocop:disable Metrics/ModuleLength
     end
 
     # @api private
+    # Mainly to work around https://github.com/rails/rails/issues/36761
+    def rails_gte_600_rc_2?
+      @rails_gte_600_rc_2 = (Rails.gem_version >= Gem::Version.new('6.0.0.rc2')) if @rails_gte_600_rc_2.nil?
+      @rails_gte_600_rc_2
+    end
+
+    # @api private
     def rails_supports_csp_nonce?
       @rails_supports_csp_nonce = (Rails.gem_version >= Gem::Version.new('5.2.0')) if @rails_supports_csp_nonce.nil?
       @rails_supports_csp_nonce
@@ -264,6 +274,7 @@ module Thredded # rubocop:disable Metrics/ModuleLength
 
   self.content_visible_while_pending_moderation = true
   self.moderator_column = :admin
+  self.show_messageboard_delete_button = false
 
   self.layout = 'thredded/application'
 
