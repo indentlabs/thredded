@@ -46,7 +46,7 @@ module Thredded
     end
 
     def can_report?
-      @can_report ||= @policy.report?
+      @can_report ||= !!@policy.try(:report?)
     end
 
     def quote_url_params
