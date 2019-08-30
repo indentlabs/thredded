@@ -142,6 +142,7 @@ en:
       pending_moderation_notice: Your post will be published when it has been reviewed by a moderator.
       quote_btn: Quote
       report: Report Post
+      report_confirm: Are you sure you want to report this post?
       reported_post: This post has been reported to moderation for review.
       spoiler_summary: Spoiler - click to show.
       spoiler_summary_for_email: 'Spoiler - select the contents below to see:'

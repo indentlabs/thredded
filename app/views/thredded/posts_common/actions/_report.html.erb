@@ -1,5 +1,5 @@
 <%= button_to t('thredded.posts.report'), post.report_path,
               method: :post,
               class: 'thredded--post--report thredded--post--dropdown--actions--item',
-              data: { confirm: "Are you sure you want to report this post?" }
+              data: { confirm: I18n.t('thredded.posts.report_confirm') }
 %>
