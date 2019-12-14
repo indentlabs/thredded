@@ -30,7 +30,7 @@ Dummy::Application.configure do
 
   # Compress JavaScripts and CSS
   config.assets.compress = true
-  config.assets.js_compressor = :uglifier
+  config.assets.js_compressor = :uglifier unless self.class.thredded_testapp_webpack?
   config.assets.css_compressor = :sass
 
   # Don't fallback to assets pipeline if a precompiled asset is missed
@@ -100,5 +100,8 @@ Dummy::Application.configure do
         SecureRandom.base64(16)
       end
     }
+    if config.respond_to?(:content_security_policy_nonce_directives=)
+      config.content_security_policy_nonce_directives = %w[script-src]
+    end
   end
 end

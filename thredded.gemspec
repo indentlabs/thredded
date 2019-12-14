@@ -29,7 +29,7 @@ Thredded works with SQLite, MySQL (v5.6.4+), and PostgreSQL. See the demo at htt
   s.add_dependency 'kaminari'
   s.add_dependency 'nokogiri'
   s.add_dependency 'pundit', '>= 1.1.0'
-  s.add_dependency 'rails', '>= 4.2.10', '<= 6.0.0.rc2' # See https://github.com/thredded/thredded/issues/822
+  s.add_dependency 'rails', '>= 4.2.10', '!= 6.0.0.rc2'
   s.add_dependency 'rb-gravatar'
 
   # post rendering
@@ -47,7 +47,7 @@ Thredded works with SQLite, MySQL (v5.6.4+), and PostgreSQL. See the demo at htt
   s.add_dependency 'autoprefixer-rails'
   s.add_dependency 'sassc-rails', '>= 2.0.0'
   s.add_dependency 'sprockets-es6'
-  s.add_dependency 'timeago_js'
+  s.add_dependency 'timeago_js', '>= 3.0.2.2'
 
   # test dependencies
   s.add_development_dependency 'capybara', '~> 2.4'

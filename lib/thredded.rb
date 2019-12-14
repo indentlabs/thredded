@@ -46,6 +46,8 @@ require 'thredded/base_notifier'
 require 'thredded/arel_compat'
 require 'thredded/collection_to_strings_with_cache_renderer'
 
+require 'thredded/webpack_assets'
+
 if Rails::VERSION::MAJOR < 5
   begin
     require 'where-or'
@@ -131,6 +133,9 @@ module Thredded # rubocop:disable Metrics/ModuleLength
 
     # @return [Number] Minimum length to trigger username auto-completion for @-mentions and private message recipients.
     attr_accessor :autocomplete_min_length
+
+    # @return [Boolean] Whether MessageboardGroup show page is enabled.
+    attr_accessor :show_messageboard_group_page
 
     # @return [Thredded::AllViewHooks] View hooks configuration.
     def view_hooks
@@ -255,13 +260,6 @@ module Thredded # rubocop:disable Metrics/ModuleLength
     end
 
     # @api private
-    # Mainly to work around https://github.com/rails/rails/issues/36761
-    def rails_gte_600_rc_2?
-      @rails_gte_600_rc_2 = (Rails.gem_version >= Gem::Version.new('6.0.0.rc2')) if @rails_gte_600_rc_2.nil?
-      @rails_gte_600_rc_2
-    end
-
-    # @api private
     def rails_supports_csp_nonce?
       @rails_supports_csp_nonce = (Rails.gem_version >= Gem::Version.new('5.2.0')) if @rails_supports_csp_nonce.nil?
       @rails_supports_csp_nonce
@@ -289,6 +287,7 @@ module Thredded # rubocop:disable Metrics/ModuleLength
   self.messageboards_order = :position
   self.topics_per_page = 50
   self.autocomplete_min_length = 2
+  self.show_messageboard_group_page = true
 
   self.auto_follow_when_creating_topic = true
   self.auto_follow_when_posting_in_topic = true

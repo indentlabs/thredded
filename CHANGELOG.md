@@ -1,3 +1,26 @@
+# v0.16.14
+
+## Added
+
+* Experimental Webpack support.
+  [#838](https://github.com/thredded/thredded/pull/838)
+* Sprockets 4.0.0 support.
+* Messageboard group page. Can be disabled by setting `Thredded.show_messageboard_group_page = false`.
+  [#829](https://github.com/thredded/thredded/pull/829)
+
+# v0.16.13
+
+## Added
+
+* Rails 6.0.0 support (6.0.0.rc2 no longer supported).
+* Destroy Messageboard button in the UI for admins. Disabled by default.
+  [#826](https://github.com/thredded/thredded/pull/826)
+
+## Fixed
+
+* Fixed `post_moderation_records` user reference type when using UUID.
+  [#819](https://github.com/thredded/thredded/pull/819)
+
 # v0.16.12
 
 ## Added
