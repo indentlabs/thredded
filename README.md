@@ -174,7 +174,7 @@ mkdir -p app/views/thredded/shared/nav && cp "$(bundle show thredded)/$_/_standa
 
 ### Application layout
 
-You can also use Thredded with your application (or other) layout by by setting `Thredded.layout` in the initializer.
+You can also use Thredded with your application (or other) layout by setting `Thredded.layout` in the initializer.
 
 In this case, you will need to reference your paths/routes carefully and pull in thredded assets (styles and javascript):
 
@@ -660,7 +660,12 @@ THREDDED_TESTAPP_WEBPACK=1 bin/rails s
 
 ### Testing
 
-To run the tests, just run `rspec`. The test suite will re-create the test database on every run, so there is no need to
+In order to run the tests locally, you will need to be running webpack-dev-server (or do a manual compilation):
+
+    cd spec/dummy && yarn && cd -
+    BUNDLE_GEMFILE="${PWD}/Gemfile" spec/dummy/bin/webpack-dev-server
+
+Then to run the tests, just run `rspec`. The test suite will re-create the test database on every run, so there is no need to
 run tasks that maintain the test database.
 
 By default, SQLite is used in development and test. On Travis, the tests will run using SQLite, PostgreSQL, MySQL,
@@ -677,8 +682,8 @@ sudo apt-get install chromium-chromedriver
 On Mac, run:
 
 ```bash
-brew cask install chromium
-brew cask install chromedriver
+brew install --cask chromium
+brew install --cask chromedriver
 ```
 
 To get better page saves (`page.save_and_open_page`) from local capybara specs ensure you are running the server locally 
@@ -777,7 +782,7 @@ start the included docker-compose.yml file with:
 
 ```console
 docker-compose build
-docker-compose up -d
+docker-compose up
 ```
 
 The above will build and run everything, daemonized, resulting in a running
