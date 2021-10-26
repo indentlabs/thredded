@@ -18,11 +18,11 @@ Thredded works with SQLite, MySQL (v5.6.4+), and PostgreSQL. See the demo at htt
 
   s.files = Dir['{app,bin,config,db,lib,vendor}/**/*'] + %w[MIT-LICENSE README.md]
 
-  s.required_ruby_version = '~> 2.3'
+  s.required_ruby_version = '>= 2.1', '< 4.0'
 
   # backend
   s.add_dependency 'active_record_union', '>= 1.3.0'
-  s.add_dependency 'db_text_search', '~> 0.3.0'
+  s.add_dependency 'db_text_search', '~> 0.3.2'
   s.add_dependency 'friendly_id'
   s.add_dependency 'htmlentities'
   s.add_dependency 'inline_svg', '>= 1.6.0'
@@ -30,13 +30,13 @@ Thredded works with SQLite, MySQL (v5.6.4+), and PostgreSQL. See the demo at htt
   s.add_dependency 'nokogiri'
   s.add_dependency 'pundit', '>= 1.1.0'
   s.add_dependency 'rails', '>= 4.2.10', '!= 6.0.0.rc2'
-  s.add_dependency 'rb-gravatar'
+  s.add_dependency 'rails_gravatar'
 
   # post rendering
   s.add_dependency 'html-pipeline'
   s.add_dependency 'kramdown', '>= 2.0.0'
   s.add_dependency 'kramdown-parser-gfm'
-  s.add_dependency 'onebox', '~> 1.8', '>= 1.8.99'
+  s.add_dependency 'onebox', '>= 1.8.99'
   # html-pipeline dependencies, see https://github.com/jch/html-pipeline#dependencies
   # for the AutolinkFilter
   s.add_dependency 'rinku'
@@ -50,9 +50,9 @@ Thredded works with SQLite, MySQL (v5.6.4+), and PostgreSQL. See the demo at htt
   s.add_dependency 'timeago_js', '>= 3.0.2.2'
 
   # test dependencies
-  s.add_development_dependency 'capybara', '~> 2.4'
+  s.add_development_dependency 'capybara', '~> 3.0'
   s.add_development_dependency 'cuprite', '>= 0.5'
-  s.add_development_dependency 'database_cleaner'
+  s.add_development_dependency 'database_cleaner', '~> 1.7'
   s.add_development_dependency 'factory_bot', '>= 5.0.2'
   s.add_development_dependency 'faker', '>= 1.9.3'
   s.add_development_dependency 'launchy'

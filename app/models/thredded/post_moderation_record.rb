@@ -3,25 +3,24 @@
 module Thredded
   class PostModerationRecord < ActiveRecord::Base
     include Thredded::ModerationState
-    # Rails 4 doesn't support enum _prefix
-    enum previous_moderation_state: moderation_states, _prefix: :previous if Rails::VERSION::MAJOR >= 5
+    enum previous_moderation_state: moderation_states, _prefix: :previous
     validates :previous_moderation_state, presence: true
 
     scope :order_newest_first, -> { order(created_at: :desc, id: :desc) }
 
     belongs_to :messageboard, inverse_of: :post_moderation_records
-    validates :messageboard_id, presence: true unless Thredded.rails_gte_51?
+
     belongs_to :post,
                inverse_of: :moderation_records,
-               **(Thredded.rails_gte_51? ? { optional: true } : {})
+               optional: true
     belongs_to :post_user,
                class_name: Thredded.user_class_name,
                inverse_of: :thredded_post_moderation_records,
-               **(Thredded.rails_gte_51? ? { optional: true } : {})
+               optional: true
     belongs_to :moderator,
                class_name: Thredded.user_class_name,
                inverse_of: :thredded_post_moderation_records,
-               **(Thredded.rails_gte_51? ? { optional: true } : {})
+               optional: true
 
     validates_each :moderation_state do |record, attr, value|
       record.errors.add attr, "Post moderation_state is already #{value}" if record.previous_moderation_state == value
@@ -30,7 +29,9 @@ module Thredded
     scope :preload_first_topic_post, -> {
       posts_table_name = Thredded::Post.quoted_table_name
       result = all
-      owners_by_id = result.each_with_object({}) { |r, h| h[r.post.postable_id] = r.post.postable }
+      owners_by_id = result.each_with_object({}) do |r, h|
+        h[r.post.postable_id] = r.post.postable if r.post
+      end
       next result if owners_by_id.empty?
       preloader = ActiveRecord::Associations::Preloader.new.preload(
         owners_by_id.values, :first_post,
@@ -60,8 +61,6 @@ module Thredded
     # @param [Symbol, String] moderation_state
     # @return [Thredded::PostModerationRecord] the newly created persisted record
     def self.record!(moderator:, post:, previous_moderation_state:, moderation_state:)
-      # Rails 4 doesn't support enum _prefix
-      previous_moderation_state = moderation_states[previous_moderation_state.to_s] if Rails::VERSION::MAJOR < 5
       create!(
         previous_moderation_state: previous_moderation_state,
         moderation_state:          moderation_state,

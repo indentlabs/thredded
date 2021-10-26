@@ -9,7 +9,7 @@ require 'html/pipeline'
 require 'html/pipeline/sanitization_filter'
 require 'rinku'
 require 'kaminari'
-require 'rb-gravatar'
+require 'rails_gravatar'
 require 'active_job'
 require 'inline_svg'
 
@@ -32,6 +32,7 @@ require 'sprockets/es6'
 require 'sassc-rails'
 
 require 'thredded/version'
+require 'thredded/compat'
 require 'thredded/engine'
 require 'thredded/errors'
 
@@ -47,15 +48,6 @@ require 'thredded/arel_compat'
 require 'thredded/collection_to_strings_with_cache_renderer'
 
 require 'thredded/webpack_assets'
-
-if Rails::VERSION::MAJOR < 5
-  begin
-    require 'where-or'
-  rescue LoadError
-    $stderr.puts "\nthredded: Please add gem 'where-or' to your Gemfile"
-    exit 1 # rubocop:disable Rails/Exit
-  end
-end
 
 module Thredded # rubocop:disable Metrics/ModuleLength
   class << self
@@ -252,22 +244,10 @@ module Thredded # rubocop:disable Metrics/ModuleLength
           .includes(:postable)
       )
     end
-
-    # @api private
-    def rails_gte_51?
-      @rails_gte_51 = (Rails.gem_version >= Gem::Version.new('5.1.0')) if @rails_gte_51.nil?
-      @rails_gte_51
-    end
-
-    # @api private
-    def rails_supports_csp_nonce?
-      @rails_supports_csp_nonce = (Rails.gem_version >= Gem::Version.new('5.2.0')) if @rails_supports_csp_nonce.nil?
-      @rails_supports_csp_nonce
-    end
   end
 
   self.user_name_column = :name
-  self.avatar_url = ->(user) { Gravatar.src(user.email, 156, 'mm') }
+  self.avatar_url = ->(user) { RailsGravatar.src(user.email, 156, 'mm') }
   self.admin_column = :admin
 
   self.content_visible_while_pending_moderation = true
