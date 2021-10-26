@@ -18,7 +18,7 @@ Thredded works with SQLite, MySQL (v5.6.4+), and PostgreSQL. See the demo at htt
 
   s.files = Dir['{app,bin,config,db,lib,vendor}/**/*'] + %w[MIT-LICENSE README.md]
 
-  s.required_ruby_version = '~> 2.3'
+  s.required_ruby_version = '>= 2.1', '< 4.0'
 
   # backend
   s.add_dependency 'active_record_union', '>= 1.3.0'
@@ -50,7 +50,7 @@ Thredded works with SQLite, MySQL (v5.6.4+), and PostgreSQL. See the demo at htt
   s.add_dependency 'timeago_js', '>= 3.0.2.2'
 
   # test dependencies
-  s.add_development_dependency 'capybara', '~> 2.4'
+  s.add_development_dependency 'capybara', '~> 3.0'
   s.add_development_dependency 'cuprite', '>= 0.5'
   s.add_development_dependency 'database_cleaner', '~> 1.7'
   s.add_development_dependency 'factory_bot', '>= 5.0.2'
