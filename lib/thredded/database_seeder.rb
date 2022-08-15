@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 require 'factory_bot'
-require_relative '../../spec/support/features/fake_content'
+require_relative '../../spec/support/system/fake_content'
 
 # rubocop:disable HandleExceptions
 begin
@@ -40,6 +40,7 @@ module Thredded
     end
 
     include LogTime
+    include Thredded::ApplicationHelper
 
     SKIP_CALLBACKS = [
       [Thredded::Post, :commit, :after, :update_parent_last_user_and_time_from_last_post, on: %i[create destroy]],
@@ -131,7 +132,13 @@ module Thredded
     end
 
     def fake_post_contents
-      @fake_post_contents ? @fake_post_contents.sample : FakeContent.post_content
+      with_mentions(@fake_post_contents ? @fake_post_contents.sample : FakeContent.post_content)
+    end
+
+    def with_mentions(post, mentions_count: rand(3))
+      return post if mentions_count.zero?
+
+      ([post] + Array.new(mentions_count).map { user_mention(@users.sample) }).join(' ')
     end
 
     def first_user

@@ -1,29 +1,25 @@
-require: rubocop-rspec
+inherit_from: .rubocop_todo.yml
+
+require:
+  - rubocop-rspec
+  - rubocop-rails
 
 AllCops:
-  TargetRubyVersion: 2.3
+  TargetRubyVersion: 2.7
   Exclude:
   - 'spec/dummy/bin/*'
   - 'spec/dummy/db/**/*'
   - 'spec/dummy/node_modules/**/*'
   - 'spec/gemfiles/vendor/**/*'
   - 'vendor/**/*'
+  NewCops: enable
 
 Bundler/OrderedGems:
   Enabled: false
 
-Capybara/FeatureMethods:
+RSpec/Capybara/FeatureMethods:
   EnabledMethods:
   - feature
-
-Style/SafeNavigation:
-  # Disable because we still support Ruby ~>2.1.
-  # TODO(glebm): Remove this when we change the minimum Ruby version to 2.3.1.
-  Enabled: false
-
-Layout/IndentHeredoc:
-  # TODO(glebm): Remove this when we change the minimum Ruby version to 2.3.1.
-  Enabled: false
 
 Layout/MultilineMethodCallIndentation:
   EnforcedStyle: indented
@@ -44,7 +40,7 @@ Metrics/BlockLength:
 Metrics/ClassLength:
   Max: 125
 
-Metrics/LineLength:
+Layout/LineLength:
   Max: 120
 
 Metrics/MethodLength:
@@ -67,7 +63,7 @@ Naming/PredicateName:
 Naming/VariableNumber:
   EnforcedStyle: snake_case
 
-Naming/UncommunicativeMethodParamName:
+Naming/MethodParameterName:
   Enabled: false
 
 Rails/ApplicationRecord:

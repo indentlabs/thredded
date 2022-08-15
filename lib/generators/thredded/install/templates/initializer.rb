@@ -29,7 +29,7 @@ Thredded.user_path = ->(user) {
 # This method is used by Thredded controllers and views to fetch the currently signed-in user
 Thredded.current_user_method = :"current_#{Thredded.user_class_name.demodulize.underscore}"
 
-# User avatar URL. rb-gravatar gem is used by default:
+# User avatar URL. rails_gravatar gem is used by default:
 Thredded.avatar_url = ->(user) { RailsGravatar.src(user.email, 156, 'mm') }
 
 # ==> Permissions Configuration
@@ -124,7 +124,7 @@ Thredded.layout = 'thredded/application'
 # Change the HTML sanitization settings used by Thredded.
 # See the Sanitize docs for more information on the underlying library: https://github.com/rgrove/sanitize/#readme
 # E.g. to allow a custom element <custom-element>:
-# Thredded::ContentFormatter.whitelist[:elements] += %w(custom-element)
+# Thredded::ContentFormatter.allowlist[:elements] += %w(custom-element)
 
 # ==> User autocompletion (Private messages and @-mentions)
 # Thredded.autocomplete_min_length = 2 lower to 1 if have 1-letter names -- increase if you want
