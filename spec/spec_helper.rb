@@ -33,13 +33,14 @@ else
   Thredded::DbTools.migrate(paths: ['db/migrate/', Rails.root.join('db', 'migrate')], quiet: true)
 end
 
-require File.expand_path('../spec/support/features/page_object/authentication', __dir__)
+require File.expand_path('../spec/support/system/page_object/authentication', __dir__)
 require 'rspec/rails'
 require 'capybara/rspec'
+require 'capybara-screenshot/rspec'
 require 'pundit/rspec'
 require 'webmock/rspec'
 require 'factory_bot'
-require 'database_cleaner'
+require 'database_cleaner/active_record'
 require 'fileutils'
 require 'active_support/testing/time_helpers'
 require 'factories'
@@ -78,12 +79,12 @@ RSpec.configure do |config| # rubocop:disable Metrics/BlockLength
 
   if ENV['MIGRATION_SPEC']
     config.before(:each, migration_spec: true) do
-      DatabaseCleaner.strategy = :transaction unless Thredded::DbTools.adapter =~ /mysql/i
-      DatabaseCleaner.start unless Thredded::DbTools.adapter =~ /mysql/i
+      DatabaseCleaner.strategy = :transaction unless /mysql/i.match?(Thredded::DbTools.adapter)
+      DatabaseCleaner.start unless /mysql/i.match?(Thredded::DbTools.adapter)
     end
 
     config.after(:each, migration_spec: true) do
-      if Thredded::DbTools.adapter =~ /mysql/i
+      if /mysql/i.match?(Thredded::DbTools.adapter)
         ActiveRecord::Tasks::DatabaseTasks.drop_current
         ActiveRecord::Tasks::DatabaseTasks.create_current
         Thredded::DbTools.restore
@@ -95,7 +96,7 @@ RSpec.configure do |config| # rubocop:disable Metrics/BlockLength
     config.before(:suite) do
       Thredded::DbTools.silence_active_record do
         # TODO: drop database cleaner and use Rails system specs
-        DatabaseCleaner.clean_with(:truncation, reset_ids: true)
+        DatabaseCleaner.clean_with(:truncation)
       end
       ActiveJob::Base.queue_adapter = :inline
     end
@@ -113,7 +114,7 @@ RSpec.configure do |config| # rubocop:disable Metrics/BlockLength
         # Driver is probably for an external browser with an app
         # under test that does *not* share a database connection with the
         # specs, so use truncation strategy.
-        DatabaseCleaner.strategy = :truncation, { reset_ids: true, cache_tables: true }
+        DatabaseCleaner.strategy = :truncation, { cache_tables: true }
       end
     end
 
@@ -137,13 +138,23 @@ browser_path = ENV['CHROMIUM_BIN'] || %w[
   /Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome
 ].find { |path| File.executable?(path) }
 
-Capybara.register_driver :cuprite do |app|
+# https://evilmartians.com/chronicles/system-of-a-test-setting-up-end-to-end-rails-testing
+Capybara.register_driver(:cuprite) do |app|
   options = {
-    window_size: [1280, 1024]
+    window_size: [1280, 1024],
+    browser_options: {},
+    # Increase Chrome startup wait time (required for stable CI builds)
+    process_timeout: 10,
+    # Enable debugging capabilities
+    inspector: true,
+    # Allow running Chrome in a headful mode by setting HEADLESS env
+    # var to a falsey value
+    headless: !ENV['HEADLESS'].in?(%w[n 0 no false])
   }
   options[:browser_path] = browser_path if browser_path
-  Capybara::Cuprite::Driver.new(app, options)
+  Capybara::Cuprite::Driver.new(app, **options)
 end
+
 Capybara.javascript_driver = ENV['CAPYBARA_JS_DRIVER']&.to_sym || :cuprite
 Capybara.configure do |config|
   # bump from the default of 2 seconds because travis can be slow

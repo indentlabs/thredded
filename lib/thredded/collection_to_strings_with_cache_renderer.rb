@@ -22,7 +22,7 @@ module Thredded
     def render_collection_to_strings_with_cache( # rubocop:disable Metrics/ParameterLists
       view_context, collection:, partial:, expires_in:, render_threads: self.class.render_threads, locals: {}, **opts
     )
-      template = @lookup_context.find_template(partial, [], true, locals, {})
+      template = @lookup_context.find_template(partial, [], true, locals.keys, {})
       collection = collection.to_a
       ActiveSupport::Notifications.instrument(:collection,
                                               identifier: template.identifier,
@@ -86,7 +86,9 @@ module Thredded
             # https://github.com/rails/rails/blob/v6.0.2.1/actionview/lib/action_view/renderer/partial_renderer.rb#L379
             # https://github.com/rails/rails/blob/v6.0.2.1/actionview/lib/action_view/renderer/partial_renderer.rb#L348-L356
             opts[:locals] = opts[:locals].dup if opts[:locals]
-            render_partials_serial(view_context.dup, slice, opts)
+            ActiveRecord::Base.connection_pool.with_connection do
+              render_partials_serial(view_context.dup, slice, opts)
+            end
           end
         end.flat_map(&:value)
       end

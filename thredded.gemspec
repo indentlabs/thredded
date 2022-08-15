@@ -13,7 +13,7 @@ Gem::Specification.new do |s| # rubocop:disable Metrics/BlockLength
   s.homepage    = 'https://thredded.org'
   s.summary     = 'The best Rails forums engine ever.'
   s.license     = 'MIT'
-  s.description = 'The best Rails 4.2+ forums engine ever. Its goal is to be as simple and feature rich as possible.
+  s.description = 'The best Rails 5.2+ forums engine ever. Its goal is to be as simple and feature rich as possible.
 Thredded works with SQLite, MySQL (v5.6.4+), and PostgreSQL. See the demo at https://thredded.org/.'
 
   s.files = Dir['{app,bin,config,db,lib,vendor}/**/*'] + %w[MIT-LICENSE README.md]
@@ -22,14 +22,14 @@ Thredded works with SQLite, MySQL (v5.6.4+), and PostgreSQL. See the demo at htt
 
   # backend
   s.add_dependency 'active_record_union', '>= 1.3.0'
-  s.add_dependency 'db_text_search', '~> 0.3.2'
+  s.add_dependency 'db_text_search'
   s.add_dependency 'friendly_id'
   s.add_dependency 'htmlentities'
   s.add_dependency 'inline_svg', '>= 1.6.0'
   s.add_dependency 'kaminari'
   s.add_dependency 'nokogiri'
   s.add_dependency 'pundit', '>= 1.1.0'
-  s.add_dependency 'rails', '>= 4.2.10', '!= 6.0.0.rc2'
+  s.add_dependency 'rails', '>= 5.2.0', '!= 6.0.0.rc2'
   s.add_dependency 'rails_gravatar'
 
   # post rendering
@@ -51,11 +51,13 @@ Thredded works with SQLite, MySQL (v5.6.4+), and PostgreSQL. See the demo at htt
 
   # test dependencies
   s.add_development_dependency 'capybara', '~> 3.0'
+  s.add_development_dependency 'capybara-screenshot'
   s.add_development_dependency 'cuprite', '>= 0.5'
-  s.add_development_dependency 'database_cleaner', '~> 1.7'
+  s.add_development_dependency 'database_cleaner-active_record', '~> 2.0'
   s.add_development_dependency 'factory_bot', '>= 5.0.2'
   s.add_development_dependency 'faker', '>= 1.9.3'
   s.add_development_dependency 'launchy'
+  s.add_development_dependency 'rails-controller-testing'
   s.add_development_dependency 'rspec-rails', '>= 3.5.0'
   s.add_development_dependency 'simplecov'
   s.add_development_dependency 'webmock'

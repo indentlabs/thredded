@@ -23,12 +23,12 @@ module Thredded
         result = all
         owners_by_id = result.each_with_object({}) { |r, h| h[r.postable_id] = r.postable }
         next result if owners_by_id.empty?
-        preloader = ActiveRecord::Associations::Preloader.new.preload(
-          owners_by_id.values, :first_post,
-          unscoped.where(<<~SQL.delete("\n"))
-          #{posts_table_name}.created_at = (
-          SELECT MAX(p2.created_at) from #{posts_table_name} p2 WHERE p2.postable_id = #{posts_table_name}.postable_id)
-        SQL
+        preloader = Thredded::Compat.association_preloader(
+          records: owners_by_id.values, associations: [:first_post],
+          scope: unscoped.where(<<~SQL.delete("\n"))
+            #{posts_table_name}.created_at = (
+            SELECT MAX(p2.created_at) from #{posts_table_name} p2 WHERE p2.postable_id = #{posts_table_name}.postable_id)
+          SQL
         )
 
         # When we can't load a preloader, return the results as-is
@@ -72,7 +72,7 @@ module Thredded
     def mark_as_unread(user)
       if previous_post.nil?
         read_state = postable.user_read_states.find_by(user_id: user.id)
-        read_state.destroy if read_state
+        read_state&.destroy
       else
         postable.user_read_states.touch!(user.id, previous_post, overwrite_newer: true)
       end
@@ -85,6 +85,7 @@ module Thredded
     protected
 
     def update_unread_posts_count
+      return if destroyed_by_association
       postable.user_read_states.update_post_counts!
     end
 

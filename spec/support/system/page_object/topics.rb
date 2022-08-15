@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require 'support/features/page_object/base'
+require 'support/system/page_object/base'
 
 module PageObject
   class Topics < Base # rubocop:disable Metrics/ClassLength
@@ -50,8 +50,8 @@ module PageObject
       visit messageboard_topics_path(messageboard)
     end
 
-    def visit_form(next_page: nil)
-      visit new_messageboard_topic_path(messageboard, next_page: next_page)
+    def visit_form(**params)
+      visit new_messageboard_topic_path(messageboard, **params)
     end
 
     def visit_latest_topic
@@ -82,15 +82,8 @@ module PageObject
       has_css?('.thredded--topics--sticky-topics-divider')
     end
 
-    def preview_html
-      # TODO: replace these sleeps with driver calls
-      # Wait for debounced preview to trigger
-      sleep 2
-      # Wait for the response from the preview handler
-      sleep 2
-      page.evaluate_script <<-JS
-        document.querySelectorAll('[data-thredded-preview-area-post]')[0].innerHTML
-      JS
+    def preview_selector
+      '[data-thredded-preview-area-post]'
     end
 
     alias has_the_title_and_content? displayed?
