@@ -136,6 +136,8 @@ en:
       delete_confirm: Are you sure you want to delete this post?
       deleted_notice: Your post has been deleted.
       edit: :thredded.nav.edit_post
+      flag: Flag Post as Spam
+      flag_confirm: Are you sure you want to flag this post as spam?
       form:
         content_label: Content
         create_btn: Submit Reply

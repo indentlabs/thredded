@@ -1,0 +1,5 @@
+<%= button_to t('thredded.posts.flag'), post.flag_path,
+              method: :post,
+              class: 'thredded--post--report thredded--post--dropdown--actions--item',
+              data: { confirm: I18n.t('thredded.posts.flag_confirm') }
+%>

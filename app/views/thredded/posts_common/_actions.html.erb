@@ -18,6 +18,9 @@
         <%= render 'thredded/posts_common/actions/mark_as_unread', post: post %>
       <% end %>
     <% end %>
+    <% if user_signed_in? && current_user.forum_moderator? %>
+      <%= render 'thredded/moderation/post_moderation_actions', post: post %>
+    <% end %>
   <% end %>
 <% end %>
 
