@@ -18,7 +18,7 @@
         <%= render 'thredded/posts_common/actions/mark_as_unread', post: post %>
       <% end %>
     <% end %>
-    <% if user_signed_in? && current_user.forum_moderator? %>
+    <% if user_signed_in? && current_user.forum_moderator? && post.instance_variable_get(:@post).is_a?(Thredded::Post) %>
       <%= render 'thredded/moderation/post_moderation_actions', post: post %>
     <% end %>
   <% end %>
