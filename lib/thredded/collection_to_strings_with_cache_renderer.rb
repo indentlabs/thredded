@@ -47,7 +47,8 @@ module Thredded
 
         ordered_keys.map do |cache_key|
           [keyed_collection[cache_key], cached_partials[cache_key] || rendered_partials.next.tap do |rendered|
-            cached_partials[cache_key] = cache.write(cache_key, rendered, expires_in: expires_in)
+            cache.write(cache_key, rendered, expires_in: expires_in)
+            cached_partials[cache_key] = rendered
           end]
         end
       end
@@ -59,16 +60,16 @@ module Thredded
       digest_path = digest_path_from_template(view, template)
 
       collection.each_with_object([{}, []]) do |item, (hash, ordered_keys)|
-        key = expanded_cache_key(item, view, template, digest_path)
+        key = expanded_cache_key(item, view, digest_path)
         ordered_keys << key
         hash[key] = item
       end
     end
 
-    def expanded_cache_key(key, view, template, digest_path)
+    def expanded_cache_key(key, view, digest_path)
       key = combined_fragment_cache_key(
         view,
-        cache_fragment_name(view, key, virtual_path: template.virtual_path, digest_path: digest_path)
+        cache_fragment_name(view, key, digest_path: digest_path)
       )
       key.frozen? ? key.dup : key # #read_multi & #write may require mutability, Dalli 2.6.0.
     end
@@ -82,34 +83,38 @@ module Thredded
       else
         collection.each_slice(collection.size / num_threads).map do |slice|
           Thread.start do
-            # `ActionView::PartialRenderer` mutates the contents of `opts[:locals]`, `opts[:locals][:as]` in particular:
-            # https://github.com/rails/rails/blob/v6.0.2.1/actionview/lib/action_view/renderer/partial_renderer.rb#L379
-            # https://github.com/rails/rails/blob/v6.0.2.1/actionview/lib/action_view/renderer/partial_renderer.rb#L348-L356
-            opts[:locals] = opts[:locals].dup if opts[:locals]
             ActiveRecord::Base.connection_pool.with_connection do
-              render_partials_serial(view_context.dup, slice, opts)
+              render_partials_serial(view_context.dup, slice, dup_opts(opts))
             end
           end
         end.flat_map(&:value)
       end
     end
 
-    if Thredded::Compat.rails_gte_61?
-      # @param [Array<Object>] collection
-      # @param [Hash] opts
-      # @param view_context
-      # @return [Array<String>]
-      def render_partials_serial(view_context, collection, opts)
-        # https://github.com/rails/rails/pull/38594
-        collection.map do |object|
-          renderer = ActionView::ObjectRenderer.new(@lookup_context, opts)
-          renderer.render_object_with_partial(object, opts[:partial], view_context, nil).body
-        end
+    # `ActionView::PartialRenderer` mutates the contents of `opts[:locals]`, `opts[:locals][:as]` in particular:
+    # https://github.com/rails/rails/blob/v6.0.2.1/actionview/lib/action_view/renderer/partial_renderer.rb#L379
+    # https://github.com/rails/rails/blob/v6.0.2.1/actionview/lib/action_view/renderer/partial_renderer.rb#L348-L356
+    def dup_opts(opts)
+      if opts[:locals]
+        opts = opts.dup
+        # sometimes have a thread safe :users_provider, preserve that for performance reasons
+        # hence not doing a deep_dup
+        opts[:locals] = opts[:locals].dup
+        opts
+      else
+        opts.dup
       end
-    else
-      def render_partials_serial(view_context, collection, opts)
-        partial_renderer = ActionView::PartialRenderer.new(@lookup_context)
-        collection.map { |object| render_partial(partial_renderer, view_context, **opts.merge(object: object)) }
+    end
+
+    # @param [Array<Object>] collection
+    # @param [Hash] opts
+    # @param view_context
+    # @return [Array<String>]
+    def render_partials_serial(view_context, collection, opts)
+      # https://github.com/rails/rails/pull/38594
+      collection.map do |object|
+        renderer = ActionView::ObjectRenderer.new(@lookup_context, opts)
+        renderer.render_object_with_partial(object, opts[:partial], view_context, nil).body
       end
     end
 
@@ -121,42 +126,16 @@ module Thredded
       view.combined_fragment_cache_key(key)
     end
 
-    if Thredded::Compat.rails_gte_60?
-      def cache_fragment_name(view, key, virtual_path:, digest_path:)
-        if Thredded::Compat.rails_gte_61?
-          view.cache_fragment_name(key, digest_path: digest_path)
-        else
-          view.cache_fragment_name(key, virtual_path: virtual_path, digest_path: digest_path)
-        end
-      end
+    def cache_fragment_name(view, key, digest_path:)
+      view.cache_fragment_name(key, digest_path: digest_path)
+    end
 
-      def digest_path_from_template(view, template)
-        view.digest_path_from_template(template)
-      end
+    def digest_path_from_template(view, template)
+      view.digest_path_from_template(template)
+    end
 
-      def render_partial(partial_renderer, view_context, opts)
-        partial_renderer.render(view_context, opts, nil).body
-      end
-    else
-      def cache_fragment_name(_view, key, virtual_path:, digest_path:)
-        if digest_path
-          ["#{virtual_path}:#{digest_path}", key]
-        else
-          [virtual_path, key]
-        end
-      end
-
-      def digest_path_from_template(view, template)
-        ActionView::Digestor.digest(
-          name: template.virtual_path,
-          finder: @lookup_context,
-          dependencies: view.view_cache_dependencies
-        ).presence
-      end
-
-      def render_partial(partial_renderer, view_context, opts)
-        partial_renderer.render(view_context, opts, nil)
-      end
+    def render_partial(partial_renderer, view_context, opts)
+      partial_renderer.render(view_context, opts, nil).body
     end
   end
 end
