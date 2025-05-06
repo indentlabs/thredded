@@ -46,6 +46,10 @@ module Thredded
       @can_moderate ||= @policy.moderate?
     end
 
+    def can_report?
+      @can_report ||= !!@policy.try(:report?)
+    end
+
     def quote_url_params
       if @post.private_topic_post?
         { post: { quote_private_post_id: @post.id } }
@@ -64,6 +68,10 @@ module Thredded
 
     def mark_unread_path
       Thredded::UrlsHelper.mark_unread_path(@post)
+    end
+
+    def report_path
+      Thredded::UrlsHelper.report_post_path(@post)
     end
 
     def destroy_path

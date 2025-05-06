@@ -136,6 +136,8 @@ en:
       delete_confirm: Are you sure you want to delete this post?
       deleted_notice: Your post has been deleted.
       edit: :thredded.nav.edit_post
+      flag: Flag Post as Spam
+      flag_confirm: Are you sure you want to flag this post as spam?
       form:
         content_label: Content
         create_btn: Submit Reply
@@ -145,6 +147,9 @@ en:
         update_btn_submitting: :thredded.form.update_btn_submitting
       pending_moderation_notice: Your post will be published when it has been reviewed by a moderator.
       quote_btn: Quote
+      report: Report Post
+      report_confirm: Are you sure you want to report this post?
+      reported_post: This post has been reported to moderation for review.
       spoiler_summary: Spoiler - click to show.
       spoiler_summary_for_email: 'Spoiler - select the contents below to see:'
     preferences:

@@ -95,6 +95,7 @@ Thredded::Engine.routes.draw do # rubocop:disable Metrics/BlockLength
       member do
         post 'mark_as_read'
         post 'mark_as_unread'
+        post 'report'
       end
     end
 
@@ -102,6 +103,7 @@ Thredded::Engine.routes.draw do # rubocop:disable Metrics/BlockLength
       member do
         post 'mark_as_read'
         post 'mark_as_unread'
+        post 'report'
       end
     end
   end
